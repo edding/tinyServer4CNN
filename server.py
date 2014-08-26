@@ -10,6 +10,10 @@ use_gpu = False
 # Set oversample option
 oversample = True
 
+# Set IP Address and Port
+ip_addr = "127.0.0.1"
+port = 10000
+
 caffe_root = 'caffe/'  
 MODEL_FILE = 'caffe/examples/imagenet/imagenet_deploy.prototxt'
 PRETRAINED = 'caffe/examples/imagenet/caffe_reference_imagenet_model'
@@ -108,7 +112,7 @@ class MyServer(SocketServer.BaseRequestHandler):
   
 if __name__ == '__main__':   
     print 'Server is started\nwaiting for connection...\n'
-
-    #set your own server ip and port
-    srv = SocketServer.ThreadingTCPServer(('127.0.0.1', 10000), MyServer)   
+    
+    addr = (ip_addr,port)
+    srv = SocketServer.ThreadingTCPServer(addr, MyServer)   
     srv.serve_forever() 
