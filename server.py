@@ -14,10 +14,10 @@ oversample = True
 ip_addr = "127.0.0.1"
 port = 10000
 
-caffe_root = 'caffe/'  
-MODEL_FILE = 'caffe/examples/imagenet/imagenet_deploy.prototxt'
-PRETRAINED = 'caffe/examples/imagenet/caffe_reference_imagenet_model'
-LABEL_FILE = 'caffe/data/ilsvrc12/synset_words.txt'
+caffe_root = '../caffe/'  
+MODEL_FILE = caffe_root + 'examples/imagenet/imagenet_deploy.prototxt'
+PRETRAINED = caffe_root + 'examples/imagenet/caffe_reference_imagenet_model'
+LABEL_FILE = caffe_root + 'data/ilsvrc12/synset_words.txt'
 PATTERN = '<id>(.*?)</id>'  #regular expression, used to get id
 
 
