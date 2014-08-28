@@ -8,13 +8,21 @@ import caffe
 use_gpu = False
 
 # Set oversample option
-oversample = True
+# When oversample is True, the network will use 10 crops to classify 
+# (4 corner + center) * 2 (mirror). When oversample is False, the network will only
+# use the center crop. The python wraper for Caffe will do the batching
+# and padding work automatically.
+#
+# If you are using this server to provide services for iOSClassifier, please leave
+# oversample as False, as the path of the input images is irregular, which means you
+# may only get some blank crop from the corner.
+oversample = False
 
 # Set IP Address and Port
-ip_addr = "127.0.0.1"
+ip_addr = '127.0.0.1'
 port = 10000
 
-caffe_root = '../caffe/'  
+caffe_root = '/Users/EdwardDing/caffe/'  
 MODEL_FILE = caffe_root + 'examples/imagenet/imagenet_deploy.prototxt'
 PRETRAINED = caffe_root + 'examples/imagenet/caffe_reference_imagenet_model'
 LABEL_FILE = caffe_root + 'data/ilsvrc12/synset_words.txt'
