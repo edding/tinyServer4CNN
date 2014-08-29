@@ -7,17 +7,6 @@ import caffe
 # If you want to use GPU for parellel calculation, set use_gpu as True
 use_gpu = False
 
-# Set oversample option
-# When oversample is True, the network will use 10 crops to classify 
-# (4 corner + center) * 2 (mirror). When oversample is False, the network will only
-# use the center crop. The python wraper for Caffe will do the batching
-# and padding work automatically.
-#
-# If you are using this server to provide services for iOSClassifier, please leave
-# oversample as False, as the path of the input images is irregular, which means you
-# may only get some blank crop from the corner.
-oversample = False
-
 # Set IP Address and Port
 ip_addr = '127.0.0.1'
 port = 10000
@@ -39,7 +28,7 @@ def loadLabel():
     return labels
 
 # CNN_Classify, return a list of possible result labels
-def CNN_Classify(imageFile):
+def CNN_Classify(imageFile, should_oversample):
     labels = loadLabel()
     
     # Initialize a CNN
@@ -58,7 +47,7 @@ def CNN_Classify(imageFile):
     input_image = caffe.io.load_image(imageFile) # defined in io.py
 
     # Set oversample Mode
-    if oversample:     
+    if should_oversample:     
        prediction = net.predict([input_image])
     else:
        prediction = net.predict([input_image], oversample = False)
@@ -73,13 +62,24 @@ class MyServer(SocketServer.BaseRequestHandler):
   
     def handle(self):   
         print 'Connected from', self.client_address   
-           
+
+        should_oversample = True;
+
         while True:   
             # Receive data from the client
             receivedData = self.request.recv(1024)
 
             if not receivedData:   
                 continue    
+            
+            # Set oversample according to the picture uploaded by the client
+            # if the picture has been cropped to interested spot, set oversample as False
+            # else set it as True
+            elif receivedData.startswith('OVERSAMPLE'):
+                if receivedData.endswith('TRUE'):
+                    should_oversample = True;
+                else:
+                    should_oversample = False;
 
             # Things to do with receiving pic from the client
             elif receivedData.startswith('<id>'):
@@ -102,7 +102,7 @@ class MyServer(SocketServer.BaseRequestHandler):
                 f.close()
 
                 # Get the result from CNN
-                result = CNN_Classify(fileName)
+                result = CNN_Classify(fileName, should_oversample)
 
                 # Send the best reuslt (only one) to the client
                 self.request.sendall(result[0])
